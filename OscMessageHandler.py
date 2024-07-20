@@ -1,11 +1,36 @@
 from pythonosc import udp_client
-# # Initialize OSC client.
-# client = udp_client.SimpleUDPClient("127.0.0.1", 39539)
+# Initialize OSC client.
+client = udp_client.SimpleUDPClient("127.0.0.1", 39539)
+
+# Define OSC ADDRESSES
+BASE_ADDRESSES = {
+    'Punch Right': '/action/punch',
+    'Punch Left': '/action/punch',
+    'Right High Kick': '/action/kick',
+    'Left High Kick': '/action/kick',
+    'Stance':'action/stance',
+    # 'Right Low Kick':'/action/kick',
+    'Left Low Kick':'/action/kick'
+}
+
+ACTION_IDENTIFIERS = {
+    'Punch Right': 1,
+    'Punch Left': 2,
+    'Right High Kick': 1,
+    'Left High Kick': 2,  
+    'Stance':1,
+    # 'Right Low Kick':1,
+    'Left Low Kick':2,
+    
+}
+
 def osc_message_handler(action_label):
-    if action_label == 'Punch Right':
-        print('Punch detected! Pressing p key')
-    if action_label == 'Punch Left':
-        print('Punch left')
-    if action_label == 'Left High Kick' or action_label == 'Right High Kick':
-        print("kick")
+    base_address=BASE_ADDRESSES.get(action_label)
+    value=ACTION_IDENTIFIERS.get(action_label)
+    
+    if base_address and value:
+        client.send_message(base_address, value)  # Send message with value 1
+        print(f"Sent OSC message: {base_address}/{value}")
+    else:
+        print(f"No OSC address defined for action: {action_label}")
     

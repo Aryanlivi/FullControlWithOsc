@@ -33,3 +33,5 @@ max_num_frames = 20  # maximum number of frames per action sequence
 num_landmarks = 33    # number of landmarks per frame
 num_features = 4      # number of features per landmark (x, y, z, visibility)
 num_classes = len(CLASSES_LIST)       # number of action classes
+
+PREDICTION_CONFIDENCE=0.5

@@ -58,7 +58,7 @@ class PoseHandler(WebcamHandler):
         action_label = CLASSES_LIST[action_idx]
         
         # Display the predicted action on the frame
-        if confidence> 0.7:
+        if confidence> PREDICTION_CONFIDENCE:
             cv2.putText(image_bgr, f'Action: {action_label} ({confidence:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             if self.input_method==OutputMethod.OSC:
                 osc_message_handler(action_label)

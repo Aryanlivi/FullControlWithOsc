@@ -1,3 +1,4 @@
-- Run FullControl Scripy.py (model path might need to be changed)
+- pipenv install
+- Python main.py  (The Output method can be selected i.e OSC or PyAutoGui)
 - Run NewCourse.exe inside Windows folder.
 - Keep your game in focus.

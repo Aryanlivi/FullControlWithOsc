@@ -10,6 +10,7 @@ numpy = "*"
 opencv-python = "*"
 mediapipe = "*"                     
 pyautogui = "*"
+python-osc = "*"
 
 [dev-packages]
 

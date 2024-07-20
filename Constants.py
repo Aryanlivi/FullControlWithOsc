@@ -1,3 +1,8 @@
+from enum import Enum
+class OutputMethod(Enum):
+    OSC=1
+    PyAutoGUI=2
+
 #DATASET_DIR = 'Single_person_violent'
 DATASET_DIR = 'Final_Dataset_trim'
 

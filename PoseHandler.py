@@ -1,17 +1,17 @@
-# from pythonosc import udp_client
 import cv2
 from webcamHandler import WebcamHandler
 from PredictPose import predict_action,preprocess_frame,normalize_z_values
 from Constants import *
-# # Initialize OSC client.
-# client = udp_client.SimpleUDPClient("127.0.0.1", 39539)
+from OscMessageHandler import osc_message_handler
+from AutoGuiHandler import autogui_message_handler
 
-class PoseDetectOSC(WebcamHandler):
-    def __init__(self,camera_index=0):
-        super().__init__(camera_index)
+class PoseHandler(WebcamHandler):
+    def __init__(self,input_method=OutputMethod.OSC): 
+        super().__init__()
         self.sequence=[]
+        self.input_method=input_method
         self.start()
-    
+        
     def start(self):
         self.init_mp()
         while self.webCam.isOpened():
@@ -31,7 +31,12 @@ class PoseDetectOSC(WebcamHandler):
         if results.pose_landmarks:
             self.mp_drawing.draw_landmarks(image_bgr,results.pose_landmarks,self.mp_pose.POSE_CONNECTIONS)
             self.preprocess_landmarks(results,image_bgr) 
-        self.display(image_bgr,"OSC Webcam")
+        if self.input_method==OutputMethod.OSC:
+            self.display(image_bgr,"OSC Webcam")
+        elif self.input_method==OutputMethod.PyAutoGUI:
+            self.display(image_bgr,"PyAutoGUI Webcam")
+        else: 
+            print("Invalid Input method")
         
     def preprocess_landmarks(self,results,image_bgr):
         # Extract landmarks and preprocess
@@ -55,12 +60,10 @@ class PoseDetectOSC(WebcamHandler):
         # Display the predicted action on the frame
         if confidence> 0.7:
             cv2.putText(image_bgr, f'Action: {action_label} ({confidence:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            if action_label == 'Punch Right':
-                print('Punch detected! Pressing p key')
-            if action_label == 'Punch Left':
-                print('Punch left')
-            if action_label == 'Left High Kick' or action_label == 'Right High Kick':
-                print("kick")
-        
-    
-osc_detect=PoseDetectOSC()
+            if self.input_method==OutputMethod.OSC:
+                osc_message_handler(action_label)
+            elif self.input_method==OutputMethod.PyAutoGUI:
+                autogui_message_handler(action_label)
+            else:
+                print("invalid input method")
+

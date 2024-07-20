@@ -5,13 +5,14 @@ class WebcamHandler:
         self.webCam=cv2.VideoCapture(camera_index)
         if not self.webCam.isOpened():
             raise Exception("Error:Couldn't Open Webcam")
+        
 
     def init_mp(self):
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.mp_drawing = mp.solutions.drawing_utils
-        
-    def start(self,use_mp=False,exit_key='q'):
+    
+    def start(self,use_mp=False):
         if(use_mp):
             self.init_mp()
         while self.webCam.isOpened():
@@ -24,7 +25,7 @@ class WebcamHandler:
             else:
                 cv2.imshow('WebcamFeed', frame)
             # Break the loop on 'q' key press.
-            if cv2.waitKey(1) & 0xFF == ord(exit_key):
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         self.release()
         
@@ -56,5 +57,3 @@ class WebcamHandler:
         self.webCam.release()
         cv2.destroyAllWindows()
 
-webcam_handler=WebcamHandler()
-webcam_handler.start(use_mp=True)

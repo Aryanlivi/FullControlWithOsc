@@ -26,19 +26,23 @@ class WebcamHandler:
             # Break the loop on 'q' key press.
             if cv2.waitKey(1) & 0xFF == ord(exit_key):
                 break
-            
         self.release()
-    
-    def draw_landmarks(self,frame):
+        
+    def process_frame(self,frame):
         # Convert the BGR image to RGB
         image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        results =self.pose.process(image_rgb)
-        
+        results = self.pose.process(image_rgb)
+        # Convert back to BGR
         image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+        
+        return results,image_bgr
+    def draw_landmarks(self,frame):
+        results,image_bgr=self.process_frame(frame)
         if results.pose_landmarks:
-            self.mp_drawing.draw_landmarks(image_bgr, results.pose_landmarks,self.mp_pose.POSE_CONNECTIONS)
-        cv2.imshow('MediaPipe Pose Detection', image_bgr)
+            self.mp_drawing.draw_landmarks(image_bgr,results.pose_landmarks,self.mp_pose.POSE_CONNECTIONS)
+        self.display(image_bgr)
+    def display(self,image,text="Webcam Feed"):
+        cv2.imshow(text, image)
         
     def get_fps(self):
         self.fps = self.webCam.get(cv2.CAP_PROP_FPS)
@@ -52,5 +56,5 @@ class WebcamHandler:
         self.webCam.release()
         cv2.destroyAllWindows()
 
-# webcam_handler=WebcamHandler()
-# webcam_handler.start(use_mp=True)
+webcam_handler=WebcamHandler()
+webcam_handler.start(use_mp=True)

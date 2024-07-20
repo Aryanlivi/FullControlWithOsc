@@ -1,4 +1,5 @@
 - pipenv install
 - Python main.py  (The Output method can be selected i.e OSC or PyAutoGui)
-- Run NewCourse.exe inside Windows folder.
+- Note that the model.h5 file is necessary yet missing in the repo for privacy purposes.
+- Run NewCourse.exe inside Windows folder(not included in repo due to heavy size).
 - Keep your game in focus.

@@ -4,7 +4,15 @@ from PredictPose import predict_action,preprocess_frame,normalize_z_values
 from Constants import *
 from OscMessageHandler import osc_message_handler
 from AutoGuiHandler import autogui_message_handler
+import time
 
+
+# Initialize variables for tracking the last action
+last_action = None
+last_action_time = time.time()
+
+# action_label=' '
+confidence=0
 class PoseHandler(WebcamHandler):
     def __init__(self,input_method=OutputMethod.OSC): 
         super().__init__()
@@ -39,9 +47,16 @@ class PoseHandler(WebcamHandler):
             print("Invalid Input method")
         
     def preprocess_landmarks(self,results,image_bgr):
+        global action_label,confidence
         # Extract landmarks and preprocess
-        landmarks = preprocess_frame(results)
-        normalized_landmarks = normalize_z_values(landmarks)
+        #landmarks = preprocess_frame(results)
+        temp_csv = []       
+        for idx,landmark in enumerate(results.pose_landmarks.landmark):                
+            if idx not in exclude_points:                            
+                #print(f"{mp_pose.PoseLandmark(idx).name}: (x: {landmark.x}, y: {landmark.y}, z: {landmark.z})")
+                temp_csv.append([landmark.x, landmark.y, landmark.z,landmark.visibility]) 
+        normalized_landmarks = normalize_z_values(temp_csv)
+        #normalized_landmarks = normalize_z_values(landmarks)
         if len(normalized_landmarks) > 0:
             self.sequence.append(normalized_landmarks)
             
@@ -51,19 +66,35 @@ class PoseHandler(WebcamHandler):
             
         # Make a prediction if sequence has enough frames
         if len(self.sequence) == max_num_frames:
-            self.make_prediction(image_bgr)
+            action_idx, confidence = predict_action(self.sequence)
+            action_label = CLASSES_LIST[action_idx]
+            if confidence>0.8:
+                self.sequence = [] 
+                osc_message_handler(action_label)
+                # autogui_message_handler(action_label) 
+            # Display the predicted action on the frame
+        if confidence> 0.8:
+            cv2.putText(image_bgr, f'Action: {action_label} ({confidence:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            #
+
             
     def make_prediction(self,image_bgr):
+        global last_action, last_action_time
         action_idx, confidence = predict_action(self.sequence)
         action_label = CLASSES_LIST[action_idx]
         
         # Display the predicted action on the frame
         if confidence> PREDICTION_CONFIDENCE:
             cv2.putText(image_bgr, f'Action: {action_label} ({confidence:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            if self.input_method==OutputMethod.OSC:
-                osc_message_handler(action_label)
-            elif self.input_method==OutputMethod.PyAutoGUI:
-                autogui_message_handler(action_label)
-            else:
-                print("invalid input method")
+            current_time=time.time()
+            if action_label != last_action or (current_time - last_action_time) > DEBOUNCE_TIME:
+                if self.input_method==OutputMethod.OSC:
+                    osc_message_handler(action_label)
+                elif self.input_method==OutputMethod.PyAutoGUI:
+                    autogui_message_handler(action_label)
+                else:
+                    print("invalid input method")
+                last_action=action_label
+                last_action_time=current_time
 
+        

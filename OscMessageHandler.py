@@ -4,13 +4,14 @@ client = udp_client.SimpleUDPClient("127.0.0.1", 39539)
 
 # Define OSC ADDRESSES
 BASE_ADDRESSES = {
-    'Punch Right': '/action/punch',
-    'Punch Left': '/action/punch',
+    'Punch Right': '/action/punch_right',
+    'Punch Left': '/action/punch_left',
     'Right High Kick': '/action/kick',
     'Left High Kick': '/action/kick',
     'Stance':'action/stance',
-    # 'Right Low Kick':'/action/kick',
-    'Left Low Kick':'/action/kick'
+    'Right Low Kick':'/action/kick',
+    'Left Low Kick':'/action/kick',
+    'Duck':'/action/duck'
 }
 
 ACTION_IDENTIFIERS = {
@@ -19,9 +20,9 @@ ACTION_IDENTIFIERS = {
     'Right High Kick': 1,
     'Left High Kick': 2,  
     'Stance':1,
-    # 'Right Low Kick':1,
+    'Right Low Kick':1,
     'Left Low Kick':2,
-    
+    'Duck':1
 }
 
 def osc_message_handler(action_label):

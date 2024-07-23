@@ -1,6 +1,7 @@
 import pyautogui
 
 def trigger_key_press(key_name):
+    print("left hanyo")
     pyautogui.press(key_name)
 
 

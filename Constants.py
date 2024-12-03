@@ -23,13 +23,13 @@ CLASSES_LIST = ['Jump',
 # Directory to save csv files
 OUTPUT_DIR = 'Output'
 
-MODEL='model_2.h5'
+MODEL='model2v2.h5'
 
 # Dataframe column header for a single video
 custom_headers = ['Frame Number', 'x','y','z','Visibility']
 
 # Define predefined parameters of the model
-max_num_frames = 20  # maximum number of frames per action sequence
+max_num_frames = 15  # maximum number of frames per action sequence
 num_landmarks = 23    # number of landmarks per frame
 num_features = 4      # number of features per landmark (x, y, z, visibility)
 num_classes = len(CLASSES_LIST)       # number of action classes

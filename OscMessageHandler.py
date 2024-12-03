@@ -11,7 +11,8 @@ BASE_ADDRESSES = {
     'Stance':'action/stance',
     'Right Low Kick':'/action/kick',
     'Left Low Kick':'/action/kick',
-    'Duck':'/action/duck'
+    'Duck':'/action/duck',
+    'Block':'/action/block'
 }
 
 ACTION_IDENTIFIERS = {
@@ -22,7 +23,8 @@ ACTION_IDENTIFIERS = {
     'Stance':1,
     'Right Low Kick':1,
     'Left Low Kick':2,
-    'Duck':1
+    'Duck':1,
+    'Block':1
 }
 
 def osc_message_handler(action_label):

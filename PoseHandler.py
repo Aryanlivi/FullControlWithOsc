@@ -10,7 +10,7 @@ import time
 # Initialize variables for tracking the last action
 last_action = None
 last_action_time = time.time()
-
+readyToPredict = False
 # action_label=' '
 confidence=0
 class PoseHandler(WebcamHandler):
@@ -36,6 +36,7 @@ class PoseHandler(WebcamHandler):
         
     def draw_landmarks(self, frame):
         results,image_bgr=self.process_frame(frame)
+        
         if results.pose_landmarks:
             self.mp_drawing.draw_landmarks(image_bgr,results.pose_landmarks,self.mp_pose.POSE_CONNECTIONS)
             self.preprocess_landmarks(results,image_bgr) 
@@ -47,7 +48,8 @@ class PoseHandler(WebcamHandler):
             print("Invalid Input method")
         
     def preprocess_landmarks(self,results,image_bgr):
-        global action_label,confidence
+        global action_label,confidence, readyToPredict
+        
         # Extract landmarks and preprocess
         #landmarks = preprocess_frame(results)
         temp_csv = []       
@@ -63,9 +65,27 @@ class PoseHandler(WebcamHandler):
         # If sequence is too long, remove the oldest frame
         if len(self.sequence) > max_num_frames:
             self.sequence.pop(0)
-            
+
+        visible_landmarks_count = 0
+        # Calculate the number of visible landmarks. We skip 0 to 10 because they are facial points and are not required
+        for idx,l in enumerate(results.pose_landmarks.landmark):
+            if idx>10 and l.visibility > VISIBILITY_THRESHOLD:
+                visible_landmarks_count += 1
+
+        # Only draw the landmarks if more that 20 landmarks are detected
+        if visible_landmarks_count < VISIBLE_POINTS_REQUIREMENT: 
+            if readyToPredict:
+                print(f'Only {visible_landmarks_count} points visisble.')
+            readyToPredict= False
+        else:
+            if not readyToPredict:
+                print(f'Ready to Predict Visible points: {visible_landmarks_count}')
+            readyToPredict = True
+            #cv2.putText(image, f'Only {visible_landmarks_count} points visible', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)                         
+        
+        
         # Make a prediction if sequence has enough frames
-        if len(self.sequence) == max_num_frames:
+        if len(self.sequence) == max_num_frames and readyToPredict:
             action_idx, confidence = predict_action(self.sequence)
             action_label = CLASSES_LIST[action_idx]
             if confidence>0.8:

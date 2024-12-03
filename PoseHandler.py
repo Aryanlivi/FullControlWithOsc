@@ -3,6 +3,7 @@ from webcamHandler import WebcamHandler
 from PredictPose import predict_action,preprocess_frame,normalize_z_values
 from Constants import *
 from OscMessageHandler import osc_message_handler
+from InputLogic import actionHandler
 from AutoGuiHandler import autogui_message_handler
 import time
 
@@ -74,12 +75,12 @@ class PoseHandler(WebcamHandler):
 
         # Only draw the landmarks if more that 20 landmarks are detected
         if visible_landmarks_count < VISIBLE_POINTS_REQUIREMENT: 
-            if readyToPredict:
-                print(f'Only {visible_landmarks_count} points visisble.')
+            # if readyToPredict:
+            #     print(f'Only {visible_landmarks_count} points visisble.')
             readyToPredict= False
         else:
-            if not readyToPredict:
-                print(f'Ready to Predict Visible points: {visible_landmarks_count}')
+            # if not readyToPredict:
+            #     print(f'Ready to Predict Visible points: {visible_landmarks_count}')
             readyToPredict = True
             #cv2.putText(image, f'Only {visible_landmarks_count} points visible', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)                         
         
@@ -90,7 +91,7 @@ class PoseHandler(WebcamHandler):
             action_label = CLASSES_LIST[action_idx]
             if confidence>0.8:
                 self.sequence = [] 
-                osc_message_handler(action_label)
+                actionHandler(action_label)
                 # autogui_message_handler(action_label) 
             # Display the predicted action on the frame
         if confidence> 0.8:
